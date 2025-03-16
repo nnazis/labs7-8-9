@@ -1,64 +1,37 @@
 import pygame
 import time
-import os
-from datetime import datetime
+import math
 pygame.init()
 width, height = 400, 400
 screen = pygame.display.set_mode((width, height))
 pygame.display.set_caption("Mickey Clock")
-background = pygame.image.load("clock")  
-minute = pygame.image.load("rightarm")   
-second = pygame.image.load("leftarm")    
-music = "music"  
-music_files = [f for f in os.listdir(music) if f.endswith(".mp3")]
-current_track = 0
-pygame.mixer.init()
-if music_files:
-    pygame.mixer.music.load(os.path.join(music, music_files[current_track]))
-def clock():
-    now = datetime.now()
-    minutes = now.minute * 6   
-    seconds = now.second * 6   
-    screen.blit(background, (0, 0))
-    minute = pygame.transform.rotate(minute, -minutes)
-    second = pygame.transform.rotate(second, -seconds)
-    m_rect = minute.get_rect(center=(width//2, height//2))
-    s_rect = second.get_rect(center=(width//2, height//2))
-    screen.blit(minute, m_rect.topleft)
-    screen.blit(second, s_rect.topleft)
-def play():
-    if music_files:
-        pygame.mixer.music.load(os.path.join(music, music_files[current_track]))
-        pygame.mixer.music.play()
-def next_track():
-    global current_track
-    current_track = (current_track + 1) % len(music_files)
-    play()
-def track():
-    global current_track
-    current_track = (current_track - 1) % len(music_files)
-    play()
-def handle_keys():
-    keys = pygame.key.get_pressed()
-    if keys[pygame.K_SPACE]:
-        if pygame.mixer.music.get_busy():
-            pygame.mixer.music.pause()
-        else:
-            pygame.mixer.music.unpause()
-    elif keys[pygame.K_s]:
-        pygame.mixer.music.stop()
-    elif keys[pygame.K_RIGHT]:
-        next_track()
-    elif keys[pygame.K_LEFT]:
-        track()
+background = pygame.image.load("clock.png")  
+right_hand = pygame.image.load("rightarm.png")  
+left_hand = pygame.image.load("leftarm.png") 
+background = pygame.transform.scale(background, (width, height))
+right_hand = pygame.transform.scale(right_hand, (20, 150))
+left_hand = pygame.transform.scale(left_hand, (15, 120))
+center = (width // 2, height // 2)
+def rotate_hand(image, angle, offset):
+    rotated_image = pygame.transform.rotate(image, angle)
+    rect = rotated_image.get_rect(center=(center[0] + offset[0], center[1] + offset[1]))
+    return rotated_image, rect
 running = True
 while running:
     screen.fill((255, 255, 255))
-    clock()
-    handle_keys()
-    pygame.display.update()
-    time.sleep(0.1)
+    screen.blit(background, (0, 0))
+    current_time = time.localtime()
+    minutes = current_time.tm_min
+    seconds = current_time.tm_sec
+    minute_angle = -(minutes * 6) 
+    second_angle = -(seconds * 6)     
+    r_hand, r_rect = rotate_hand(right_hand, minute_angle, (0, -75))
+    l_hand, l_rect = rotate_hand(left_hand, second_angle, (0, -60))    
+    screen.blit(r_hand, r_rect.topleft)
+    screen.blit(l_hand, l_rect.topleft)    
+    pygame.display.flip()
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            running = False
+            running = False 
+    pygame.time.delay(1000)  
 pygame.quit()
