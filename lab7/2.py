@@ -1,29 +1,35 @@
 import pygame
+import os
 pygame.init()
-width, height = 500, 500
-rad = 25
-ball_color = (255, 0, 0)  
-bg_color = (255, 255, 255)  
-STEP = 20
-screen = pygame.display.set_mode((width, height))
-pygame.display.set_caption("Ball")
-x, y = width // 2, height // 2
+pygame.mixer.init()
+music = "music/"
+tracks = [f for f in os.listdir(music) if f.endswith(".mp3")]
+current_track = 0
+def play_music():
+    pygame.mixer.music.load(os.path.join(music, tracks[current_track]))
+    pygame.mixer.music.play()
+    print(f"Playing: {tracks[current_track]}")
+if tracks:
+    play_music()
+else:
+    print("No music found in the folder!")
 running = True
 while running:
-    pygame.time.delay(50)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-    keys = pygame.key.get_pressed()
-    if keys[pygame.K_LEFT] and x - rad - STEP >= 0:
-        x -= STEP
-    if keys[pygame.K_RIGHT] and x + rad + STEP <= width:
-        x += STEP
-    if keys[pygame.K_UP] and y - rad - STEP >= 0:
-        y -= STEP
-    if keys[pygame.K_DOWN] and y + rad + STEP <= height:
-        y += STEP
-        screen.fill(bg_color)
-    pygame.draw.circle(screen, ball_color, (x, y), rad)
-    pygame.display.update()
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_SPACE:  
+                if pygame.mixer.music.get_busy():
+                    pygame.mixer.music.pause()
+                else:
+                    pygame.mixer.music.unpause()
+            elif event.key == pygame.K_s:  
+                pygame.mixer.music.stop()
+            elif event.key == pygame.K_n:  
+                current_track = (current_track + 1) % len(tracks)
+                play_music()
+            elif event.key == pygame.K_p:  
+                current_track = (current_track - 1) % len(tracks)
+                play_music()
 pygame.quit()
