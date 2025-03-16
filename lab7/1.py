@@ -6,9 +6,9 @@ pygame.init()
 width, height = 400, 400
 screen = pygame.display.set_mode((width, height))
 pygame.display.set_caption("Mickey Clock")
-background = pygame.image.load("mickey_clock.png")  
-minute = pygame.image.load("right_hand.png")   
-second = pygame.image.load("left_hand.png")    
+background = pygame.image.load("clock")  
+minute = pygame.image.load("rightarm")   
+second = pygame.image.load("leftarm")    
 music = "music"  
 music_files = [f for f in os.listdir(music) if f.endswith(".mp3")]
 current_track = 0
